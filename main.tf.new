@@ -1,0 +1,54 @@
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.aws_region
+}
+
+# Local variables for common tags
+locals {
+  common_tags = {
+    Environment = var.environment
+    Project     = var.project_name
+    ManagedBy   = "Terraform"
+  }
+}
+
+# VPC Module
+module "vpc" {
+  source = "./modules/vpc"
+
+  vpc_cidr       = var.vpc_cidr
+  project_name   = var.project_name
+  common_tags    = local.common_tags
+}
+
+# Subnets Module
+module "subnets" {
+  source = "./modules/subnets"
+
+  vpc_id                  = module.vpc.vpc_id
+  project_name            = var.project_name
+  public_subnet_cidrs     = var.public_subnet_cidrs
+  private_subnet_cidrs    = var.private_subnet_cidrs
+  common_tags             = local.common_tags
+}
+
+# Routing Module
+module "routing" {
+  source = "./modules/routing"
+
+  vpc_id               = module.vpc.vpc_id
+  project_name         = var.project_name
+  internet_gateway_id  = module.vpc.internet_gateway_id
+  public_subnet_ids    = module.subnets.public_subnet_ids
+  private_subnet_ids   = module.subnets.private_subnet_ids
+  common_tags          = local.common_tags
+}

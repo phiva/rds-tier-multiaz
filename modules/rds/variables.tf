@@ -21,13 +21,13 @@ variable "environment" {
 variable "engine" {
   description = "RDS database engine (mysql, postgres, mariadb, oracle-se2, sqlserver-ex)"
   type        = string
-  default     = "postgres"
+  default     = "mysql"
 }
 
 variable "engine_version" {
   description = "RDS database engine version"
   type        = string
-  default     = "15.4"
+  default     = "8.0.45"
 }
 
 variable "instance_class" {
@@ -76,7 +76,7 @@ variable "master_password" {
 variable "database_port" {
   description = "Database port"
   type        = number
-  default     = 5432
+  default     = 3306
 }
 
 variable "allowed_cidr_blocks" {
